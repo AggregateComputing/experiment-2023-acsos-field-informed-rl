@@ -10,4 +10,4 @@ gradleEnterprise {
     }
 }
 
-rootProject.name = "alchemist-boids"
+rootProject.name = "experiment-2023-acsos-field-informed-rl"
