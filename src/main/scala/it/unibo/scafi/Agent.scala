@@ -16,17 +16,13 @@ trait Agent
     with Gradients
     with StateManagement
     with FieldUtils {
-  def computeState(relativeDistance: P = currentPosition()): AgentState = {
-    val neighborInfo = includingSelf
-      .reifyField(nbr(senseEnvData[Double]("info")), nbrVector())
+  def computeState(data: Map[Int, (P, Double, Double, P)] = Map.empty): AgentState = {
+    val neighborInfo = data
       .view
-      .mapValues { case (density, distance) => NeighborInfo(density, (distance.x, distance.y), -1) }
+      .mapValues { case (information, density, distance, additionalInfo) => NeighborInfo(density, (information.x, information.y), distance, (additionalInfo.x, additionalInfo.y),  -1) }
       .toMap
-    val updatedNeigh = neighborInfo.updated(
-      mid(),
-      NeighborInfo(senseEnvData[Double]("info"), (relativeDistance.x, relativeDistance.y), -1)
-    )
-    AgentState(mid(), node.get[Double]("area"), List(updatedNeigh), Contextual.empty)
+
+    AgentState(mid(), node.get[Double]("view"), List(neighborInfo), Contextual.empty)
   }
 
   def policy: AgentState => Int = {

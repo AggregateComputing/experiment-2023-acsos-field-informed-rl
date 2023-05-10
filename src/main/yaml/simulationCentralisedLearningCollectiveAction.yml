@@ -25,7 +25,7 @@ variables:
   windowSize: &windowSize { formula: 5, language: application/x-scala }
   actionSpaceEvaluated: &actionSpaceEvaluated
     #formula: "it.unibo.learning.abstractions.ActionSpace.create(5, List(0, 1, 1.5, 2.0, 2.5, 3.0))"
-    formula: "it.unibo.learning.abstractions.ActionSpace.create(5, List(0.5), true)"
+    formula: "it.unibo.learning.abstractions.ActionSpace.create(20, List(0, 0.5, 1), false)"
     language: application/x-scala
 
   neuralNet: &neuralNet
@@ -63,9 +63,9 @@ seeds:
   simulation: *random
 
 layers:
-  - type: CircleLayer
-    parameters: [500, 500, 200, 1]
+  - type: BidimensionalGaussianLayer
     molecule: info
+    parameters: [ 500, 500, 1, 100 ]
 
 environment:
   type: Continuous2DEnvironment
@@ -97,7 +97,7 @@ deployments:
   parameters: [0, 0, *width, *width, *spacing, *spacing, *randomness, *randomness]
   contents:
     molecule: view
-    concentration: 100.0
+    concentration: 75.0
   programs:
     - *program
 export:

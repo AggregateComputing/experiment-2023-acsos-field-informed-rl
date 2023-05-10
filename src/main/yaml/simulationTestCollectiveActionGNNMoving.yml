@@ -20,8 +20,8 @@ variables:
     language: application/x-scala
 
   batchSize: &batchSize { formula: 32, language: application/x-scala }
-  episodeLength: &episodeLength { formula: 200, language: application/x-scala }
-  bufferSize: &bufferSize { formula: 10000, language: application/x-scala }
+  episodeLength: &episodeLength { formula: 1000, language: application/x-scala }
+  bufferSize: &bufferSize { formula: 1000, language: application/x-scala }
   actionSpaceEvaluated: &actionSpaceEvaluated
     formula: "it.unibo.learning.abstractions.ActionSpace.create(20, List(0, 0.5, 1), false)"
     language: application/x-scala
@@ -50,10 +50,10 @@ variables:
       import it.unibo.learning.network.GraphNeuralNetworkRL;
       import it.unibo.scripting._;
       new DeepGnnQLearning(
-        epsilon = DecayReference.exponentialDecay(0.99, 0.1).bounded(0.05),
+        epsilon = DecayReference.exponentialDecay(0.0, 0.1).bounded(0.00),
         alpha = 0.0001,
         gamma = 0.99,
-        copyEach = episodeLength.as[Int],
+        copyEach = 200,
         referenceNet = neuralNet.as[GraphNeuralNetworkRL]
       )
     language: application/x-scala
@@ -65,10 +65,7 @@ seeds:
   simulation: *random
 
 layers:
-  - type: CircleLayer
-    parameters: [500, 500, 200, 1]
-    molecule: info_old
-  - type: BidimensionalGaussianLayer
+  - type: BidimensionalMovableLayer
     molecule: info
     parameters: [ 500, 500, 1, 100 ]
 environment:
@@ -79,7 +76,12 @@ environment:
         type: DiracComb
         parameters: [ 0.2, 1.0 ]
       type: GlobalLearnerDecentralisedAgentCollectiveGNN
-      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, true]
+      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false]
+    - time-distribution:
+        type: DiracComb
+        parameters: [ 0.2, 5.0 ]
+      type: MovingLayer
+      parameters: [ *episodeLength ]
 
 network-model:
   type: ConnectWithinDistance
@@ -100,7 +102,7 @@ deployments:
   parameters: [0, 0, *width, *width, *spacing, *spacing, *randomness, *randomness]
   contents:
     molecule: view
-    concentration: 75.0
+    concentration: 100.0
   programs:
     - *program
 export:

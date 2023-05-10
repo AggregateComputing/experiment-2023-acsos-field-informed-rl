@@ -23,7 +23,7 @@ variables:
   episodeLength: &episodeLength { formula: 200, language: application/x-scala }
   bufferSize: &bufferSize { formula: 10000, language: application/x-scala }
   actionSpaceEvaluated: &actionSpaceEvaluated
-    formula: "it.unibo.learning.abstractions.ActionSpace.create(5, List(0.5), true)"
+    formula: "it.unibo.learning.abstractions.ActionSpace.create(20, List(0, 0.5, 1), false)"
     language: application/x-scala
 
   neuralNet: &neuralNet
@@ -65,9 +65,10 @@ seeds:
   simulation: *random
 
 layers:
-  - type: CircleLayer
-    parameters: [500, 500, 200, 1]
+  - type: BidimensionalGaussianLayer
     molecule: info
+    parameters: [ 500, 500, 1, 100 ]
+
 
 environment:
   type: Continuous2DEnvironment

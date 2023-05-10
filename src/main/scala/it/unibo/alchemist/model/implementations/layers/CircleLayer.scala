@@ -7,10 +7,11 @@ class CircleLayer[P <: Position2D[P]](
     val x: Double,
     val y: Double,
     val radius: Double,
-    val value: Double
+    val valueBase: Double
 ) extends Layer[Double, P]
     with CenterBasedMovableLayer[P] {
 
+  override def value(x: Double, y: Double): Double = valueBase
   override protected def isInside(x: Double, y: Double): Boolean =
     Math.sqrt(Math.pow(x - movingX, 2) + Math.pow(y - movingY, 2)) <= radius
 }

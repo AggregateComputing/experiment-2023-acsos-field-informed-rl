@@ -6,7 +6,7 @@ trait CenterBasedMovableLayer[P <: Position2D[P]] extends MovableLayer with Laye
   def x: Double // x component of the center
   def y: Double // y component of the center
 
-  def value: Double // value of the layer
+  def value(x: Double, y: Double): Double // value of the layer
 
   protected var movingX: Double = x
   protected var movingY: Double = y
@@ -16,7 +16,7 @@ trait CenterBasedMovableLayer[P <: Position2D[P]] extends MovableLayer with Laye
     val pointX = p.getX
     val pointY = p.getY
     if (isInside(pointX, pointY)) {
-      value
+      value(pointX, pointY)
     } else {
       0
     }

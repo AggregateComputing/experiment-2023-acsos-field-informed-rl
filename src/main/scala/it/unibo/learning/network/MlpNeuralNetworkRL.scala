@@ -49,7 +49,7 @@ object MlpNeuralNetworkRL {
     def encodeSpatialUnbounded(state: AgentState, considerAction: Boolean): py.Any = {
       val currentSnapshot = state.neighborhoodSensing.head.toList.sortBy(_._2.distance[Double])
       val data = currentSnapshot.map(_._2.data[Double]).replaceInfinite() to LazyList
-      val position = currentSnapshot.map(_._2.distanceVector[(Double, Double)]) to LazyList
+      val position = currentSnapshot.map(_._2.information[(Double, Double)]) to LazyList
       if (considerAction) {
         val actions = currentSnapshot.map(_._2.oldAction[Int])
         data.zip(actions).map { case (data, action) => List(data, action.toDouble).toPythonCopy }.toPythonCopy
@@ -64,8 +64,10 @@ object MlpNeuralNetworkRL {
       val local = state.neighborhoodSensing.head.me(state.me)
       Seq(
         local.data[Double],
-        local.distanceVector[(Double, Double)]._1,
-        local.distanceVector[(Double, Double)]._2
+        local.information[(Double, Double)]._1,
+        local.information[(Double, Double)]._2,
+        //local.additionalInfo[(Double, Double)]._1,
+        //local.additionalInfo[(Double, Double)]._2,
       ).toPythonCopy
     }
     def encodeSpatial(state: AgentState, neigh: Int, considerAction: Boolean): py.Any = {
@@ -74,7 +76,7 @@ object MlpNeuralNetworkRL {
           state.neighborhoodSensing.head.withoutMe(state.me).toList.sortBy(_._2.distance[Double]).take(neigh)
         val data = currentSnapshot
           .flatMap { case (id, data) =>
-            List(data.data, data.distanceVector[(Double, Double)]._1, data.distanceVector[(Double, Double)]._2)
+            List(data.data, data.information[(Double, Double)]._1, data.information[(Double, Double)]._2)
           }
           .replaceInfinite() to LazyList
         if (considerAction) {
@@ -86,8 +88,8 @@ object MlpNeuralNetworkRL {
       }
       val localInformation = LazyList[Double](
         state.extractCurrentLocal.data[Double],
-        state.extractCurrentLocal.distanceVector[(Double, Double)]._1,
-        state.extractCurrentLocal.distanceVector[(Double, Double)]._2
+        state.extractCurrentLocal.information[(Double, Double)]._1,
+        state.extractCurrentLocal.information[(Double, Double)]._2
       )
       val fill: LazyList[Double] = LazyList.continually(0.0)
       (localInformation #::: (states #::: fill)).take(neigh * (if (considerAction) 4 else 3)).toPythonCopy

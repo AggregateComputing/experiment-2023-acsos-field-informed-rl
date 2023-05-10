@@ -11,7 +11,7 @@ import me.shadaj.scalapy.py.SeqConverters
 class MLPSpatial(
     hiddenSize: Int,
     val actionSpace: List[Any],
-    val encoder: NeuralNetworkEncoder[Id] = new SpatialEncoder(5)
+    val encoder: NeuralNetworkEncoder[Id] = new SpatialEncoder(1)
 ) extends MlpNeuralNetworkRL {
   override val underlying: py.Dynamic = DQN(this.encoder.shape.reverse.head, hiddenSize, actionSpace.size)
 

@@ -1,5 +1,6 @@
 package it.unibo.learning.abstractions
 
+import it.unibo.learning.GaussianThreshold
 import it.unibo.learning.abstractions.AgentState.NeighborInfo
 
 import scala.collection.immutable.Queue
@@ -17,12 +18,13 @@ case class AgentState(
 
 object AgentState {
   object NeighborInfo {
-    def apply(data: Double, distanceVector: (Double, Double), oldAction: Int): NeighborInfo =
+    def apply(data: Double, information: (Double, Double), neighborhoodDistance: Double, additionalInfo: (Double, Double), oldAction: Int): NeighborInfo =
       new NeighborInfo(
         Map(
-          "data" -> data,
-          "distanceVector" -> distanceVector,
-          "distance" -> math.hypot(distanceVector._1, distanceVector._2),
+          "data" -> data, //(if(data > GaussianThreshold.Value) { 1.0 } else { 0.0 }),
+          "information" -> information,
+          "distance" -> neighborhoodDistance,
+          "additionalInfo" -> additionalInfo,
           "oldAction" -> oldAction
         )
       )
