@@ -78,7 +78,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             } else {
                 // A graphics environment should be available, so load the effects for the UI from the "effects" folder
                 // Effects are expected to be named after the simulation file
-                args("-g", "effects/${it.nameWithoutExtension}.json")
+                args("-g", "effects/effect.json")
             }
             // This tells gradle that this task may modify the content of the export directory
             outputs.dir(exportsDir)
