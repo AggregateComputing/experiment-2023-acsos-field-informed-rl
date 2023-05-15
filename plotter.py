@@ -3,7 +3,11 @@ import xarray as xr
 import re
 from pathlib import Path
 import collections
-
+import pandas as pd
+import seaborn as sns
+sns.set_theme(style="darkgrid")
+sns.set_context("paper")
+#sns.set(font_scale=1.8)
 def distance(val, ref):
     return abs(ref - val)
 vectDistance = np.vectorize(distance)
@@ -184,13 +188,13 @@ if __name__ == '__main__':
     # How to name the summary of the processed data
     pickleOutput = 'data_summary'
     # Experiment prefixes: one per experiment (root of the file name)
-    experiments = ['basic', 'gnn']
+    experiments = ['basic', 'gnn', 'mlp']
     floatPrecision = '{: 0.3f}'
     # Number of time samples 
-    timeSamples = 2000
+    timeSamples = 20000 - 200
     # time management
-    minTime = 300
-    maxTime = 20000
+    minTime = 200
+    maxTime = 20000 - 1
     timeColumnName = 'time'
     logarithmicTime = False
     # One or more variables are considered random and "flattened"
@@ -409,9 +413,27 @@ if __name__ == '__main__':
                                 figname = figname.replace(symbol, '_')
                             fig.savefig(f'{by_time_output_directory}/{figname}.pdf')
                             plt.close(fig)
-    for experiment in experiments:
-        current_experiment_means = means[experiment]
-        current_experiment_errors = stdevs[experiment]
-        generate_all_charts(current_experiment_means, current_experiment_errors, basedir = f'{experiment}/all')
+    def mean_along_time(array, tag, save):
+        converted = array.copy()
+        converted['episode'] = (converted['time'] / 200.0).astype(int)
+        grouped = converted.groupby('episode').mean()
+        grouped['mode'] = save
+        return grouped.to_dataframe().reset_index()
+    
+    def add_std_to_mean(means, stds, tag, save):
+        to_stack = [means[tag], means[tag] + stds[tag], means[tag] - stds[tag]]
+        to_stack = [mean_along_time(element, tag, save) for element in to_stack]
+        return pd.concat(to_stack).reset_index()
 
+    Path(output_directory).mkdir(parents=True, exist_ok=True)
+    dfs = [add_std_to_mean(means, stdevs, 'gnn', "GNN (informed)"),  add_std_to_mean(means, stdevs, 'basic', "GNN "), add_std_to_mean(means, stdevs, 'mlp', "MLP")]
+    df = pd.concat(dfs).reset_index()
+    ax = sns.lineplot(data=df, x='episode', y="totalReward", hue='mode')
+    fig = ax.get_figure()
+    fig.savefig(output_directory+"/reward-in-time.pdf", bbox_inches='tight')
+    fig.clear()
+    ax = sns.lineplot(data=df, x='episode', y="coverage", hue='mode')
+    fig = ax.get_figure()
+    fig.savefig(output_directory+"/coverage-in-time.pdf", bbox_inches='tight')
+    
 # Custom charting
