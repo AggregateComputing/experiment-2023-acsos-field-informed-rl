@@ -123,3 +123,6 @@ export:
       - type: CoverageExtractor
         parameters: [ *view ]
       - type: StoreExtractor
+      - molecule: inside
+        aggregators: [ sum ]
+        value-filter: onlyfinite
