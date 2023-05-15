@@ -17,7 +17,8 @@ class GlobalLearnerDecentralisedAgent[T, P <: Position[P]](
     val actionSpace: ActionSpace.Space,
     val episodeLength: Int,
     val box: Box,
-    val learn: Boolean
+    val learn: Boolean,
+    val seed: Int
 ) extends AbstractGlobalLearner[T, P, Seq, Id] {
   override def empty[A]: Seq[A] = Seq.empty
 

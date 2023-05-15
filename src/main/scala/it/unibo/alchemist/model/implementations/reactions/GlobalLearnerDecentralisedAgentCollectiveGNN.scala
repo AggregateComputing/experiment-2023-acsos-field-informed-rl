@@ -19,10 +19,13 @@ class GlobalLearnerDecentralisedAgentCollectiveGNN[T, P <: Position[P]](
     val actionSpace: ActionSpace.Space,
     val episodeLength: Int,
     val box: Box,
-    val learn: Boolean
+    val learn: Boolean,
+    val name: String,
+    val seed: Int
 ) extends AbstractGlobalLearner[T, P, Graph, Graph] {
   override def empty[A]: Graph[A] = null
 
+  override def snapshotName: String = name
   override def prepareStates: Graph[AgentState] = {
     val currentStates = states
     val neighborhoodCompute = neighborhood(currentStates)

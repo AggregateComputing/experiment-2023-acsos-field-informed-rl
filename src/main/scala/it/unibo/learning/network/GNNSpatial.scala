@@ -25,7 +25,7 @@ class GNNSpatial(
     val _device = device
     (graph: Graph[AgentState]) => {
       py.`with`(torch.no_grad()) { _ =>
-        scribe.info(s"Before forward pass : ${torchUtil.dumbMemory(device)}")
+        //scribe.info(s"Before forward pass : ${torchUtil.dumbMemory(device)}")
         val encoded = encoder.encode(graph, _device).asInstanceOf[py.Dynamic]
         encoded.record()
         val normalized = encoder.normalize(encoded.x).record()
@@ -38,9 +38,9 @@ class GNNSpatial(
             buffer += data.bracketAccess(i).as[Int]
           }
         }
-        scribe.info(s"After forward pass : ${torchUtil.dumbMemory(device)}")
+        //scribe.info(s"After forward pass : ${torchUtil.dumbMemory(device)}")
         session.clear()
-        scribe.info(s"Clear after forward pass : ${torchUtil.dumbMemory(device)}")
+        //scribe.info(s"Clear after forward pass : ${torchUtil.dumbMemory(device)}")
         Graph(buffer.toSeq, graph.connections)
       }
     }

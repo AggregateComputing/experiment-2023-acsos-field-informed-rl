@@ -18,9 +18,11 @@ class GlobalLearnerDecentralisedAgentCollective[T, P <: Position[P]](
     val actionSpace: ActionSpace.Space,
     val episodeLength: Int,
     val box: Box,
-    val learn: Boolean
+    val learn: Boolean,
+    val seed: Int
 ) extends AbstractGlobalLearner[T, P, Seq, Id] {
 
+  override def snapshotName: String = "mlp"
   override def empty[A]: Seq[A] = Seq.empty[A]
 
   override def prepareStates: Seq[AgentState] = states

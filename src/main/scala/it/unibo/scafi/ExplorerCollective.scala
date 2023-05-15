@@ -16,6 +16,7 @@ class ExplorerCollective extends Agent {
     node.put("phenomena", phenomena)
     node.put("source", source)
     node.put("constant", 1.0)
+    node.put("inside", phenomena > GaussianThreshold.Value)
     // compute angle from direction
     node.put("center", math.atan2(-1 * direction.y, direction.x))
     val state = computeState(data)

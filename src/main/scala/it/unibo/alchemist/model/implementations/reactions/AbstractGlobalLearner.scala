@@ -1,5 +1,6 @@
 package it.unibo.alchemist.model.implementations.reactions
 
+import it.unibo.alchemist.Store
 import it.unibo.alchemist.model.implementations.actions.RunScafiProgram
 import it.unibo.alchemist.model.implementations.molecules.SimpleMolecule
 import it.unibo.alchemist.model.implementations.nodes.SimpleNodeManager
@@ -19,6 +20,8 @@ trait AbstractGlobalLearner[T, P <: Position[P], BatchF[_], ExperienceF[_]]
     extends AbstractGlobalReaction[T, P]
     with DecayableSource {
   private val VELOCITY_MULTIPLIER = 10
+
+  def seed: Int
   def snapshotName: String = "global_learner"
 
   def folder: String = "snapshot"
@@ -61,18 +64,18 @@ trait AbstractGlobalLearner[T, P <: Position[P], BatchF[_], ExperienceF[_]]
     val currentStates = prepareStates
     improvePolicy(currentStates)
     val currentActions = prepareActions(currentStates)
-    scribe.info(s"Time = $currentTime")
+    //scribe.info(s"Time = $currentTime")
     actionMemory = currentActions
     stateMemory = currentStates
     performAction(prepareActionForActing(currentActions))
     if ((currentTime.toInt % episodeLength) == 0) {
       simulations += 1
-      scribe.info("Change environment")
+      //scribe.info("Change environment")
       if (!os.path.exists(folder).as[Boolean]) {
         os.makedirs(folder)
       }
       if (learn) {
-        learner.store(folder + "/" + snapshotName + "_" + totalRewardPerEpisode.toInt + "_" + currentTime)
+        learner.store(folder + "/" + snapshotName + "_" + totalRewardPerEpisode.toInt + "_" + currentTime + "_" + seed + "pt")
       }
       decayable.foreach(_._2.update())
       decayable.foreach { case (name, reference) =>
@@ -83,7 +86,9 @@ trait AbstractGlobalLearner[T, P <: Position[P], BatchF[_], ExperienceF[_]]
         totalRewardPerEpisode,
         environment.getSimulation.getTime.toDouble.toInt
       )
+      Store.store("totalReward", totalRewardPerEpisode)
       totalRewardPerEpisode = 0
+
       val newPosition = box.createGrid(environment, random)
       newPosition.zip(agents).foreach { case (position, node) =>
         resetNode(position.asInstanceOf[P], node)
