@@ -25,7 +25,7 @@ class CoverageDrawer extends Effect {
     val position = wormhole.getViewPoint(environment.getPosition(node))
     val (x, y) = (position.x, position.y)
     // Todo remove magic number pls
-    g.setColor(new Color(125, 125, 125, 125))
+    g.setColor(new Color(125, 125, 125, 30))
     val shape = new Ellipse2D.Float(-center, -center, areaSize, areaSize)
     val transform = new AffineTransform
     transform.translate(x, y)

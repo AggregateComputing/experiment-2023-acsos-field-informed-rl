@@ -13,8 +13,16 @@ import java.util
 import javax.imageio.ImageIO
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
-class CoverageExtractor(val size: Double) extends Extractor[Double] {
-  override def getColumnNames: util.List[String] = util.List.of("coverage")
+class CoverageExtractor(val size: Double, layers: Int) extends Extractor[Double] {
+
+  def this(size: Double) =
+    this(size, 1)
+  override def getColumnNames: util.List[String] = {
+    if(layers > 1)
+      util.List.of("coverage", "coverage_1", "coverage_2")
+    else
+      util.List.of("coverage")
+  }
 
   override def extractData[T](
       environment: Environment[T, _],
@@ -24,26 +32,34 @@ class CoverageExtractor(val size: Double) extends Extractor[Double] {
   ): util.Map[String, Double] = {
     val nodes = environment.getNodes.iterator().asScala.map(node => environment.typedPosition(node))
     val coordinates = nodes.map(position => (position.getCoordinate(0), position.getCoordinate(1)))
-    val shapes = coordinates.map { case (x, y) => new Ellipse2D.Double(x - size / 2, - (y - size / 2), size, size) }
-    val layers = environment.getLayers.iterator().asScala.filter(_.isInstanceOf[CircleLayer[_]])
-      .map(_.asInstanceOf[CircleLayer[_]]).toList
+    val shapes = coordinates.map { case (x, y) => new Ellipse2D.Double(x - size / 2, -(y - size / 2), size, size) }
+    val layers = environment.getLayers
+      .iterator()
+      .asScala
+      .filter(_.isInstanceOf[CircleLayer[_]])
+      .map(_.asInstanceOf[CircleLayer[_]])
+      .toList
     val circles = layers
-      .map(layer => new Ellipse2D.Double(layer.x - layer.radius, - layer.y - layer.radius, layer.radius * 2,layer.radius * 2))
+      .map(layer =>
+        new Ellipse2D.Double(layer.x - layer.radius, -layer.y - layer.radius, layer.radius * 2, layer.radius * 2)
+      )
 
     def computeCoverage(reference: Ellipse2D): Double = {
-        val path = new Path2D.Double()
-        val merged = shapes.foldLeft[Path2D.Double](path) { (acc, area) => acc.append(area, false); acc }
-        val area = new Area(merged)
-        val referenceArea = new Area(reference)
-        val totalArea = referenceArea.area
-        referenceArea.subtract(area)
-        val covered = referenceArea.area
-        (totalArea - covered) / totalArea
+      val path = new Path2D.Double()
+      val merged = shapes.foldLeft[Path2D.Double](path) { (acc, area) => acc.append(area, false); acc }
+      val area = new Area(merged)
+      val referenceArea = new Area(reference)
+      val totalArea = referenceArea.area
+      referenceArea.subtract(area)
+      val covered = referenceArea.area
+      (totalArea - covered) / totalArea
     }
-
-    val totalCoverage = circles.map(computeCoverage).sum / circles.size
-
-    util.Map.of("coverage", totalCoverage)
+    val partialCoverage = circles.map(computeCoverage)
+    val totalCoverage = partialCoverage.sum / circles.size
+    if(this.layers > 1)
+      util.Map.of("coverage", totalCoverage, "coverage_1", partialCoverage.head, "coverage_2", partialCoverage(1))
+    else
+      util.Map.of("coverage", totalCoverage)
   }
 
   implicit class RichEnvironment[T](environment: Environment[T, _]) {

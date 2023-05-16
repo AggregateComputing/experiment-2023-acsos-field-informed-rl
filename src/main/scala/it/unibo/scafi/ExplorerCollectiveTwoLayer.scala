@@ -17,6 +17,8 @@ class ExplorerCollectiveTwoLayer extends Agent {
     node.put("source", source)
     node.put("constant", 1.0)
     node.put("inside", phenomena > GaussianThreshold.Value)
+    node.put("inside_1", senseEnvData[Double]("info1") > GaussianThreshold.Value)
+    node.put("inside_2", senseEnvData[Double]("info2") > GaussianThreshold.Value)
     // compute angle from direction
     node.put("center", math.atan2(-1 * direction.y, direction.x))
     val state = computeState(data)

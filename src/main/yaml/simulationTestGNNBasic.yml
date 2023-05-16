@@ -41,7 +41,7 @@ variables:
       import it.unibo.learning.network._;
       import it.unibo.scripting._;
       new GNNSpatial(
-        hiddenSize = 256,
+        hiddenSize = 64,
         actionSpace = actionSpaceEvaluated.as[List[Any]]
       )
     language: application/x-scala
@@ -82,7 +82,7 @@ environment:
         type: DiracComb
         parameters: [ 0.2, 1.0 ]
       type: GlobalLearnerDecentralisedAgentCollectiveGNN
-      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false, "gnn-informed", *random]
+      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false, "gnn", *random]
 
 network-model:
   type: ConnectWithinDistance
@@ -96,7 +96,7 @@ _reactions:
         type: Event
         actions:
           - type: RunScafiProgram
-            parameters: [it.unibo.scafi.ExplorerCollective, 2 ]
+            parameters: [it.unibo.scafi.ExplorerBasic, 2 ]
       - program: send
 deployments:
   type: Grid
@@ -110,7 +110,7 @@ export:
   - type: CSVExporter
     parameters:
       exportPath: "test"
-      fileNameRoot: "gnn-informed"
+      fileNameRoot: "gnn"
       interval: 1.0
     data:
       - time

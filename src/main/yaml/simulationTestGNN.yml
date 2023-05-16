@@ -16,7 +16,6 @@ variables:
   view: &view
     formula: 75.0
 
-
   environmentBox: &environmentBox
     formula: |
       import it.unibo.scripting._;
@@ -70,11 +69,11 @@ seeds:
 
 layers:
   - type: CircleLayer
-    parameters: [500, 500, 200, 1]
+    parameters: [ 500, 500, 200, 0 ]
     molecule: info_old
   - type: BidimensionalGaussianLayer
     molecule: info
-    parameters: [ 500, 500, 1, 100 ]
+    parameters: [ 500, 500, 1, 80 ]
 environment:
   type: Continuous2DEnvironment
   parameters: []
@@ -83,7 +82,7 @@ environment:
         type: DiracComb
         parameters: [ 0.2, 1.0 ]
       type: GlobalLearnerDecentralisedAgentCollectiveGNN
-      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false, "gnn-informed"]
+      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false, "gnn-informed", *random]
 
 network-model:
   type: ConnectWithinDistance
@@ -110,10 +109,18 @@ deployments:
 export:
   - type: CSVExporter
     parameters:
-      exportPath: "export"
-      fileNameRoot: "simulation"
+      exportPath: "test"
+      fileNameRoot: "gnn-informed"
       interval: 1.0
     data:
       - time
       - type: CoverageExtractor
         parameters: [ *view ]
+      - type: StoreExtractor
+      - molecule: inside
+        aggregators: [ sum ]
+        value-filter: onlyfinite
+
+terminate:
+  - type: AfterTime
+    parameters: 200

@@ -140,7 +140,7 @@ object LearningEffect {
 
   private val MAX_COLOR: Double = 255
 
-  private val DRONE_SHAPE: Polygon = new Polygon(Array(-1, 0, 1), Array(1, -2, 1), 3)
+  private val DRONE_SHAPE: Ellipse2D.Double = new Ellipse2D.Double(-0.5, -0.5, 1, 1)
 
   private val DRONE_SIZE = 4.0
 }

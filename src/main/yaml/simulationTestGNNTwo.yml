@@ -42,7 +42,7 @@ variables:
       import it.unibo.learning.network._;
       import it.unibo.scripting._;
       new GNNSpatial(
-        hiddenSize = 64,
+        hiddenSize = 256,
         actionSpace = actionSpaceEvaluated.as[List[Any]]
       )
     language: application/x-scala
@@ -70,11 +70,11 @@ seeds:
 
 layers:
   - type: CircleLayer
-    parameters: [ 200, 200, 200, 1 ]
+    parameters: [ 200, 200, 200, 0 ]
     molecule: info_old
   - type: CircleLayer
-    parameters: [ 700, 700, 200, 1 ]
-    molecule: info_old
+    parameters: [ 700, 700, 200, 0 ]
+    molecule: info_old2
   - type: BidimensionalGaussianLayer
     parameters: [700, 700, 1, 100]
     molecule: info1
@@ -92,7 +92,7 @@ environment:
         type: DiracComb
         parameters: [ 0.2, 1.0 ]
       type: GlobalLearnerDecentralisedAgentCollectiveGNN
-      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false]
+      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false, *random]
 
 
 network-model:
@@ -107,7 +107,7 @@ _reactions:
         type: Event
         actions:
           - type: RunScafiProgram
-            parameters: [it.unibo.scafi.ExplorerCollective, 2 ]
+            parameters: [it.unibo.scafi.ExplorerCollectiveTwoLayer, 2 ]
       - program: send
 deployments:
   type: Grid
@@ -121,9 +121,17 @@ export:
   - type: CSVExporter
     parameters:
       exportPath: "export"
-      fileNameRoot: "simulation"
+      fileNameRoot: "two-informed"
       interval: 1.0
     data:
       - time
       - type: CoverageExtractor
         parameters: [ *view ]
+      - type: StoreExtractor
+      - molecule: inside
+        aggregators: [ sum ]
+        value-filter: onlyfinite
+
+terminate:
+  - type: AfterTime
+    parameters: 200.0
