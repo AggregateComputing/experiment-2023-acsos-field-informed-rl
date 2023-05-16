@@ -85,7 +85,7 @@ environment:
       parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false, "gnn-informed", *random]
     - time-distribution:
         type: DiracComb
-        parameters: [ 0.2, 2.0 ]
+        parameters: [ 0.2, 4.0 ]
       type: MovingLayer
       parameters: [ *episodeLength ]
 

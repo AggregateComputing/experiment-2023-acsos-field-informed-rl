@@ -30,7 +30,7 @@ class CoverageExtractor(val size: Double, layers: Int) extends Extractor[Double]
       time: interfaces.Time,
       l: Long
   ): util.Map[String, Double] = {
-    val nodes = environment.getNodes.iterator().asScala.map(node => environment.typedPosition(node))
+    val nodes = environment.getNodes.iterator().asScala.toList.map(node => environment.typedPosition(node))
     val coordinates = nodes.map(position => (position.getCoordinate(0), position.getCoordinate(1)))
     val shapes = coordinates.map { case (x, y) => new Ellipse2D.Double(x - size / 2, -(y - size / 2), size, size) }
     val layers = environment.getLayers

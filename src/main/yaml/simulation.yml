@@ -97,7 +97,7 @@ _reactions:
         type: Event
         actions:
           - type: RunScafiProgram
-            parameters: [it.unibo.scafi.ExplorerBasic, 2 ]
+            parameters: [it.unibo.scafi.ExplorerCollective, 2 ]
       - program: send
 deployments:
   type: Grid
@@ -111,7 +111,7 @@ export:
   - type: CSVExporter
     parameters:
       exportPath: "test"
-      fileNameRoot: "mlp"
+      fileNameRoot: "moving-mlp"
       interval: 1.0
     data:
       - time

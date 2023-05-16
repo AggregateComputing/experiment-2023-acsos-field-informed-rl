@@ -70,11 +70,20 @@ seeds:
 
 layers:
   - type: CircleLayer
-    parameters: [ 500, 500, 200, 0 ]
+    parameters: [ 200, 200, 200, 0 ]
     molecule: info_old
+  - type: CircleLayer
+    parameters: [ 700, 700, 200, 0 ]
+    molecule: info_old2
   - type: BidimensionalGaussianLayer
+    parameters: [700, 700, 1, 100]
+    molecule: info1
+  - type: BidimensionalGaussianLayer
+    parameters: [200, 200, 1, 100 ]
+    molecule: info2
+  - type: CombineAllLayer
+    parameters: [ ]
     molecule: info
-    parameters: [ 500, 500, 1, 80 ]
 environment:
   type: Continuous2DEnvironment
   parameters: []
@@ -97,7 +106,7 @@ _reactions:
         type: Event
         actions:
           - type: RunScafiProgram
-            parameters: [it.unibo.scafi.ExplorerBasic, 2 ]
+            parameters: [it.unibo.scafi.ExplorerCollective, 2 ]
       - program: send
 deployments:
   type: Grid
@@ -111,17 +120,23 @@ export:
   - type: CSVExporter
     parameters:
       exportPath: "test"
-      fileNameRoot: "mlp"
+      fileNameRoot: "two-mlp"
       interval: 1.0
     data:
       - time
       - type: CoverageExtractor
-        parameters: [ *view ]
+        parameters: [ *view, 2 ]
       - type: StoreExtractor
       - molecule: inside
+        aggregators: [ sum ]
+        value-filter: onlyfinite
+      - molecule: inside_1
+        aggregators: [ sum ]
+        value-filter: onlyfinite
+      - molecule: inside_2
         aggregators: [ sum ]
         value-filter: onlyfinite
 
 terminate:
   - type: AfterTime
-    parameters: 200
+    parameters: 200.0

@@ -13,7 +13,7 @@ class MovingLayer[T, P <: Position[P]](
   override protected def executeBeforeUpdateDistribution(): Unit = {
     environment.getLayers.iterator().asScala.foreach {
       case circle: CenterBasedMovableLayer[_] =>
-        circle.moveWith(0.2, 0.2)
+        circle.moveWith(0.2, -0.2)
         if (environment.getSimulation.getTime.toDouble.toInt % period == 0) {
           circle.reset()
         }
