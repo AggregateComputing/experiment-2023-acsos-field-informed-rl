@@ -5,6 +5,7 @@ from pathlib import Path
 import collections
 import pandas as pd
 import seaborn as sns
+from itertools import repeat
 sns.set_theme(style="darkgrid")
 sns.set_context("paper")
 #sns.set(font_scale=1.8)
@@ -180,6 +181,9 @@ def beautifyValue(v):
         return v
 
 if __name__ == '__main__':
+    def mergeLists(*lists):
+        return [item for sublist in zip(*lists) for item in sublist]
+
     # CONFIGURE SCRIPT
     # Where to find Alchemist data files
     directory = 'test'
@@ -188,7 +192,10 @@ if __name__ == '__main__':
     # How to name the summary of the processed data
     pickleOutput = 'data_summary'
     # Experiment prefixes: one per experiment (root of the file name)
-    experiments = ['gnn-informed', 'gnn', 'mlp']
+    experiments = ['gnn-informed', 'gnn', 'mlp', 'two-informed', 'two-gnn', 'two-mlp', 'moving-informed', 'moving-gnn', 'moving-mlp']
+    count = int(len(experiments) / 3)
+    name = mergeLists(list(repeat('GNN (informed)', count)), list(repeat('GNN', count)), list(repeat('MLP', count)))
+    experiment_name = list(repeat('Zone Fixed', 3)) + list(repeat('Two Zones', 3)) + list(repeat('Moving', 3)) 
     floatPrecision = '{: 0.3f}'
     # Number of time samples 
     timeSamples = 50
@@ -413,27 +420,18 @@ if __name__ == '__main__':
                                 figname = figname.replace(symbol, '_')
                             fig.savefig(f'{by_time_output_directory}/{figname}.pdf')
                             plt.close(fig)
-    def mean_along_time(array, tag, save):
-        converted = array.copy()
-        converted['episode'] = (converted['time'] / 200.0).astype(int)
-        grouped = converted.groupby('episode').mean()
-        grouped['mode'] = save
-        return grouped.to_dataframe().reset_index()
-    
-    def add_std_to_mean(means, stds, tag, save):
+    def add_std_to_mean(means, stds, tag, save, experiment_name):
         to_stack = [means[tag], means[tag] + stds[tag], means[tag] - stds[tag]]
-        to_stack = [mean_along_time(element, tag, save) for element in to_stack]
-        return pd.concat(to_stack).reset_index()
+        to_stack = [element.to_dataframe() for element in to_stack]
+        stacked = pd.concat(to_stack).reset_index()
+        stacked['mode'] = save
+        stacked['experiment'] = experiment_name
+        return stacked
 
     Path(output_directory).mkdir(parents=True, exist_ok=True)
-    dfs = [add_std_to_mean(means, stdevs, 'gnn', "GNN (informed)"),  add_std_to_mean(means, stdevs, 'basic', "GNN "), add_std_to_mean(means, stdevs, 'mlp', "MLP")]
-    df = pd.concat(dfs).reset_index()
-    ax = sns.lineplot(data=df, x='episode', y="totalReward", hue='mode')
-    fig = ax.get_figure()
-    fig.savefig(output_directory+"/reward-in-time.pdf", bbox_inches='tight')
-    fig.clear()
-    ax = sns.lineplot(data=df, x='episode', y="coverage", hue='mode')
-    fig = ax.get_figure()
-    fig.savefig(output_directory+"/coverage-in-time.pdf", bbox_inches='tight')
-    
+
+    # Zip experiment array with name
+    elements = [(experiment, name, experiment_name) for experiment, name, experiment_name in zip(experiments, name, experiment_name)]
+    means_with_std = [add_std_to_mean(means, stdevs, experiment, name, experiment_name) for experiment, name, experiment_name in elements]
+    df = pd.concat(means_with_std)
 # Custom charting
