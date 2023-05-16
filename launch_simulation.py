@@ -7,7 +7,10 @@ from multiprocessing import Process
 simulation = [
     #"simulationCentralisedLearningGNN",
     #"simulationCentralisedLearningGNNBasic",
-    "simulationCentralisedLearningMLP"
+    #"simulationCentralisedLearningMLP"
+    #"simulationTestGNN",
+    #"simulationTestGNNBasic",
+    "simulationTestMLP",
 ]
 to_replace = """
   random: &random
@@ -34,7 +37,7 @@ for file in simulation:
     file = os.path.join(yaml_fold, file + ".yml")
     new_file = os.path.join(yaml_fold, "simulation.yml")
 
-    for i in range(1, 2):
+    for i in range(1, 32):
         # Copy the file to a new file using os
         shutil.copyfile(file, new_file)
 
