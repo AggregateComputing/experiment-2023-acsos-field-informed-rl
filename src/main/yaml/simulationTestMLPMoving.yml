@@ -54,7 +54,7 @@ variables:
       import it.unibo.learning.network.MlpNeuralNetworkRL;
       import it.unibo.scripting._;
       new DeepQLearning(
-        epsilon = DecayReference.exponentialDecay(0.9, 0.1).bounded(0.02),
+        epsilon = DecayReference.exponentialDecay(0.0, 0.1).bounded(0.02),
         alpha = 0.0001,
         gamma = 0.99,
         copyEach = episodeLength.as[Int],
@@ -72,7 +72,7 @@ layers:
   - type: CircleLayer
     parameters: [ 500, 500, 200, 0 ]
     molecule: info_old
-  - type: BidimensionalGaussianLayer
+  - type: BidimensionalMovableLayer
     molecule: info
     parameters: [ 500, 500, 1, 80 ]
 environment:
@@ -84,7 +84,11 @@ environment:
         parameters: [ 0.2, 1.0 ]
       type: GlobalLearnerDecentralisedAgentCollective
       parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false, *random]
-
+    - time-distribution:
+        type: DiracComb
+        parameters: [ 0.2, 4.0 ]
+      type: MovingLayer
+      parameters: [ *episodeLength ]
 network-model:
   type: ConnectWithinDistance
   parameters: [ 300 ]
