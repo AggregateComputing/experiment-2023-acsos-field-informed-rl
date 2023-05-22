@@ -5,12 +5,13 @@ from pathlib2 import Path
 from multiprocessing import Process
 # Get the file passed from the command line
 simulation = [
-    #"simulationCentralisedLearningGNN",
-    #"simulationCentralisedLearningGNNBasic",
-    #"simulationCentralisedLearningMLP"
-    #"simulationTestGNN",
-    #"simulationTestGNNBasic",
+    "simulationCentralisedLearningGNN",
+    "simulationCentralisedLearningGNNBasic",
+    "simulationCentralisedLearningMLP"
+    "simulationTestGNN",
+    "simulationTestGNNBasic",
     "simulationTestMLP",
+    "simulationTestMLPTwo"
 ]
 to_replace = """
   random: &random
@@ -37,7 +38,7 @@ for file in simulation:
     file = os.path.join(yaml_fold, file + ".yml")
     new_file = os.path.join(yaml_fold, "simulation.yml")
 
-    for i in range(1, 32):
+    for i in range(1, 64):
         # Copy the file to a new file using os
         shutil.copyfile(file, new_file)
 

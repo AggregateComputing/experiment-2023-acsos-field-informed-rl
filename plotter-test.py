@@ -9,6 +9,7 @@ from itertools import repeat
 sns.set_theme(style="darkgrid")
 sns.set_context("paper")
 #sns.set(font_scale=1.8)
+sns.set(font_scale=1.2)
 def distance(val, ref):
     return abs(ref - val)
 vectDistance = np.vectorize(distance)
@@ -428,10 +429,40 @@ if __name__ == '__main__':
         stacked['experiment'] = experiment_name
         return stacked
 
+    sns.set(font_scale=1.2)
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
     # Zip experiment array with name
     elements = [(experiment, name, experiment_name) for experiment, name, experiment_name in zip(experiments, name, experiment_name)]
     means_with_std = [add_std_to_mean(means, stdevs, experiment, name, experiment_name) for experiment, name, experiment_name in elements]
-    df = pd.concat(means_with_std)
+    df = pd.concat(means_with_std).reset_index()
+    
+    ax = sns.relplot(data=df, x="time", y="inside[sum]", col="experiment", hue="mode", kind="line")
+    fig = ax.fig
+    fig.savefig(output_directory+"/inside-test.pdf", bbox_inches='tight')
+    fig.clear()
+    ax = sns.relplot(data=df, x="time", y="coverage", col="experiment", hue="mode", kind="line")
+    fig = ax.fig
+    fig.savefig(output_directory+"/coverage-test.pdf", bbox_inches='tight')
+    fig.clear()
+    only_two = df[df['experiment'] == "Two Zones"]
+    right = only_two.drop(columns=["inside_1[sum]", "coverage_1"])
+    left = only_two.drop(columns=["inside_2[sum]", "coverage_2"])
+    
+    left["inside[sum]"] = left["inside_1[sum]"]
+    left["coverage"] = left["coverage_1"]
+    left["area"] = 1
+    right["inside[sum]"] = right["inside_2[sum]"]
+    right["coverage"] = right["coverage_2"]
+    right["area"] = 2
+    merged = pd.concat([left, right])
+    ax = sns.relplot(data=merged.reset_index(), x="time", y="inside[sum]", col="mode", hue="area", kind="line", palette="tab10")
+    fig = ax.fig
+    fig.savefig(output_directory+"/inside-two-test.pdf", bbox_inches='tight')
+    fig.clear()
+    ax = sns.relplot(data=merged.reset_index(), x="time", y="coverage", col="mode", hue="area", kind="line", palette="tab10")
+    fig = ax.fig
+    fig.savefig(output_directory+"/coverage-two-test.pdf", bbox_inches='tight')
+    fig.clear()
+    
 # Custom charting

@@ -7,7 +7,7 @@ import pandas as pd
 import seaborn as sns
 sns.set_theme(style="darkgrid")
 sns.set_context("paper")
-#sns.set(font_scale=1.8)
+sns.set(font_scale=1.2)
 def distance(val, ref):
     return abs(ref - val)
 vectDistance = np.vectorize(distance)
@@ -413,6 +413,8 @@ if __name__ == '__main__':
                                 figname = figname.replace(symbol, '_')
                             fig.savefig(f'{by_time_output_directory}/{figname}.pdf')
                             plt.close(fig)
+
+    sns.set(font_scale=1.2)
     def mean_along_time(array, tag, save):
         converted = array.copy()
         converted['episode'] = (converted['time'] / 200.0).astype(int)
