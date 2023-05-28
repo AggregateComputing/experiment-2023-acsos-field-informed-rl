@@ -14,8 +14,6 @@ import java.awt.geom._
 
 /** ad-hoc effect to draw drones, animal and station. */
 class LearningEffect extends Effect {
-  private var positionsMemory: Map[Int, Seq[(Position2D[_], Double)]] = Map.empty
-  private var lastDrawMemory: Map[Int, Int] = Map.empty
 
   @ExportForGUI(nameToExport = "Track")
   private val trackEnabled: Boolean = true
@@ -64,10 +62,8 @@ class LearningEffect extends Effect {
     val transform = getTransform(x, y, nodeSize.getVal, currentRotation)
     val color = createColorOrBlack(node, environment)
     val transformedShape = transform.createTransformedShape(DRONE_SHAPE)
-    if (trackEnabled) drawTrajectory(node, color, wormhole, g, DRONE_SHAPE)
     g.setColor(color)
     g.fill(transformedShape)
-    updateTrajectory(node, environment)
   }
 
   private def rotation[T](node: Node[T]): Double = {
@@ -84,39 +80,6 @@ class LearningEffect extends Effect {
     transform
   }
 
-  private def drawTrajectory[P <: Position2D[P]](
-      node: Node[_],
-      colorBase: Color,
-      wormhole: Wormhole2D[P],
-      g: Graphics2D,
-      shape: Shape
-  ): Unit = {
-    val positions = positionsMemory.getOrElse(node.getId, Seq.empty)
-    val alpha = MAX_COLOR / ((Math.min(snapshotSize.getVal, positions.size) * ADJUST_ALPHA_FACTOR) + 1)
-    positions.filter(_ => trackEnabled).takeRight(snapshotSize.getVal).zipWithIndex.foreach {
-      case ((nodePosition, rotation), index) =>
-        val colorFaded =
-          new Color(colorBase.getRed, colorBase.getGreen, colorBase.getBlue, Math.max(1, (alpha * (index + 1)).toInt))
-        val viewPoint: Point = wormhole.getViewPoint(nodePosition.asInstanceOf[P])
-        val (x, y) = (viewPoint.x, viewPoint.y)
-        val transform = getTransform(x, y, nodeSize.getVal, rotation)
-        val transformedShape = transform.createTransformedShape(shape)
-        g.setColor(colorFaded)
-        g.fill(transformedShape)
-    }
-  }
-
-  private def updateTrajectory[P <: Position2D[P], T](node: Node[T], environment: Environment[T, P]): Unit = {
-    val positions = positionsMemory.getOrElse(node.getId, Seq.empty)
-    val lastDraw = lastDrawMemory.getOrElse(node.getId, 0)
-    val roundedTime = environment.getSimulation.getTime.toDouble.toInt
-    if (roundedTime >= lastDraw) {
-      lastDrawMemory += (node.getId -> (lastDraw + timespan.getVal))
-      positionsMemory += (node.getId ->
-        (positions :+ (environment.getPosition(node) -> rotation(node)))
-          .takeRight(MAX_LENGTH))
-    }
-  }
   private def createColorOrBlack(node: Node[_], environment: Environment[_, _]): Color = {
     val currentMolecule = new SimpleMolecule(colorMolecule)
     if (node.contains(currentMolecule)) {
