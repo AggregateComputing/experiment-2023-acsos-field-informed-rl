@@ -37,9 +37,8 @@ abstract class AbstractDeepQLearning[F[_], N <: NeuralNetworkRL[F, N]]() extends
   override def store(where: String): Unit = torch.sais_availableve(targetNetwork.underlying.state_dict(), where)
 
   override def load(where: String): Unit = {
-    println(device)
-    targetNetwork.underlying.load_state_dict(torch.load(where))
-    policyNetwork.underlying.load_state_dict(torch.load(where))
+    targetNetwork.underlying.load_state_dict(torch.load(where, map_location=device))
+    policyNetwork.underlying.load_state_dict(torch.load(where, map_location=device))
 
     targetNetwork.underlying.eval()
     policyNetwork.underlying.eval()

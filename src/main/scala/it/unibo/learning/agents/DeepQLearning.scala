@@ -16,7 +16,7 @@ class DeepQLearning(
     override val gamma: Double,
     override val copyEach: Int,
     override val referenceNet: MlpNeuralNetworkRL,
-    override val deviceName: String = "cuda:0"
+    override val deviceName: String = "cpu"
 ) extends AbstractDeepQLearning[Id, MlpNeuralNetworkRL]
     with NodeLearner {
   import session._
