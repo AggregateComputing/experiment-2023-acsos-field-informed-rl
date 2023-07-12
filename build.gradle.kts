@@ -89,10 +89,13 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                     args("-hl", "-t", "2")
                 } else {
                     args("-g", "effects/standard-effect.json")
+                }ù
+                if (System.getenv("CI") == "true") {
+
                 }
                 jvmArgs(
                         "-Dscalapy.python.library=python3.9",
-                        "-Dscalapy.python.programname=${pythonBin().trim()}"
+                        if (System.getenv("CI") == "true") { "" } { "-Dscalapy.python.programname=${pythonBin().trim()}"}
                         //Other required parameters...
                 )
                 this.additionalConfiguration()
