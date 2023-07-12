@@ -65,7 +65,7 @@ val runAllBatch by tasks.register<DefaultTask>("runAllBatch") {
     description = "Launches all experiments"
 }
 
-val pythonBin: String = ByteArrayOutputStream().use { outputStream ->
+fun pythonBin(): String = ByteArrayOutputStream().use { outputStream ->
     project.exec {
         commandLine("pyenv",  "which", "python")
         standardOutput = outputStream
@@ -92,7 +92,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                 }
                 jvmArgs(
                         "-Dscalapy.python.library=python3.9",
-                        "-Dscalapy.python.programname=${pythonBin.trim()}"
+                        "-Dscalapy.python.programname=${pythonBin().trim()}"
                         //Other required parameters...
                 )
                 this.additionalConfiguration()
