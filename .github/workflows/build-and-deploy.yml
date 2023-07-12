@@ -37,7 +37,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Install python
-        uses: actions/setup-python@v4.5.0
+        uses: gabrielfalcao/pyenv-action@v11
       - name: Upgrade pip
         run: pip install --upgrade pip --user
       - name: Install requirements
