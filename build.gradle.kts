@@ -92,12 +92,12 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                 }
                 jvmArgs(
                         "-Dscalapy.python.library=python3.9",
-                        if (System.getenv("CI") == "true") { "" } else { "-Dscalapy.python.programname=${pythonBin().trim()}"}
+                         "-Dscalapy.python.programname=${if (System.getenv("CI") == "true") { "" } else { pythonBin() }}",
                         //Other required parameters...
                 )
                 this.additionalConfiguration()
             }
-            val capitalizedName = it.nameWithoutExtension.capitalize()
+     val capitalizedName = it.nameWithoutExtension.capitalize()
             val graphic by basetask("run${capitalizedName}Graphic")
             runAllGraphic.dependsOn(graphic)
             val batch by basetask("run${capitalizedName}Batch") {
