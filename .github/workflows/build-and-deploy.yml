@@ -15,6 +15,12 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3.3.0
+    - name: Install python
+      uses: gabrielfalcao/pyenv-action@v11
+    - name: Upgrade pip
+      run: pip install --upgrade pip --user
+    - name: Install requirements
+      run: pip install -r requirements.txt --user
     - uses: DanySK/build-check-deploy-gradle-action@2.2.0
       with:
         build-command: true
