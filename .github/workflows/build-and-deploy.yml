@@ -16,7 +16,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3.3.0
     - name: Install python
-      uses: gabrielfalcao/pyenv-action@v11
+      uses: actions/setup-python@v4.5.0
     - name: Upgrade pip
       run: pip install --upgrade pip --user
     - name: Install requirements
@@ -43,7 +43,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Install python
-        uses: gabrielfalcao/pyenv-action@v11
+        uses: actions/setup-python@v4.5.0
       - name: Upgrade pip
         run: pip install --upgrade pip --user
       - name: Install requirements
