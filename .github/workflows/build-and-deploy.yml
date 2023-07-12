@@ -17,6 +17,8 @@ jobs:
       uses: actions/checkout@v3.3.0
     - name: Install python
       uses: actions/setup-python@v4.5.0
+      with:
+        python-version: '3.9'
     - name: Upgrade pip
       run: pip install --upgrade pip --user
     - name: Install requirements
@@ -44,6 +46,8 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Install python
         uses: actions/setup-python@v4.5.0
+        with:
+          python-version: '3.9'
       - name: Upgrade pip
         run: pip install --upgrade pip --user
       - name: Install requirements
