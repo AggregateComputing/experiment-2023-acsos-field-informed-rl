@@ -60,27 +60,27 @@
     }
   },
   {
-    "type": "class it.unibo.alchemist.boundary.gui.effects.DensityMapDrawer",
+    "type": "class it.unibo.alchemist.boundary.gui.effects.AnyLayerDrawer",
     "samples": {
       "max": 400,
       "min": 10,
-      "val": 239
+      "val": 100
     },
     "minLayerValue": "0.0",
-    "maxLayerValue": "100.0",
+    "maxLayerValue": "1.0",
     "minLayerValueCached": "0.0",
-    "maxLayerValueCached": "100.0",
+    "maxLayerValueCached": "1.0",
     "minLayerValueDouble": 0.0,
-    "maxLayerValueDouble": 100.0,
+    "maxLayerValueDouble": 1.0,
     "mapper": {
-      "type": "class it.unibo.alchemist.boundary.gui.effects.DensityMapFunction"
+      "type": "class it.unibo.alchemist.boundary.gui.effects.AnyLayerFunction"
     },
     "layerFilter": false,
     "molString": "",
     "alpha": {
       "max": 255,
       "min": 0,
-      "val": 188
+      "val": 127
     },
     "red": {
       "max": 255,
@@ -98,11 +98,45 @@
       "val": 255
     },
     "colorCache": {
-      "value": -1140850433
+      "value": 2130706687
     },
-    "markerNodeID": 256
+    "markerNodeID": 0
   },
   {
-    "type": "class it.unibo.alchemist.boundary.gui.effects.TimeseriesPlotting"
+    "type": "class it.unibo.alchemist.boundary.gui.effects.AngleDrawer",
+    "molecule": "angle",
+    "intensity": "intensity",
+    "maxValueRanged": {
+      "max": 100,
+      "min": 1,
+      "val": 57
+    },
+    "stroke": {
+      "max": 10,
+      "min": 1,
+      "val": 2
+    }
+  },
+  {
+    "type": "class it.unibo.alchemist.boundary.gui.effects.LearningEffect",
+    "trackEnabled": true,
+    "snapshotSize": {
+      "max": 1000,
+      "min": 10,
+      "val": 138
+    },
+    "timespan": {
+      "max": 100,
+      "min": 1,
+      "val": 10
+    },
+    "nodeSize": {
+      "max": 20,
+      "min": 1,
+      "val": 20
+    },
+    "colorMolecule": "hue",
+    "velocityMolecule": "velocity",
+    "maxValue": ""
   }
 ]

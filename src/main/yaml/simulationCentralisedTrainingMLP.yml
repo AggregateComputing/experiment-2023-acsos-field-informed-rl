@@ -11,10 +11,11 @@ variables:
     default: 0
 
   range: &range
-    formula: 300
+    formula: 400
 
   view: &view
     formula: 75.0
+
 
   environmentBox: &environmentBox
     formula: |
@@ -22,10 +23,12 @@ variables:
       it.unibo.learning.Box(width.as[Double], spacing.as[Double], randomness.as[Double])
     language: application/x-scala
 
-  batchSize: &batchSize { formula: 32, language: application/x-scala }
+  batchSize: &batchSize { formula: 512, language: application/x-scala }
   episodeLength: &episodeLength { formula: 200, language: application/x-scala }
-  bufferSize: &bufferSize { formula: 10000, language: application/x-scala }
+  bufferSize: &bufferSize { formula: 100000, language: application/x-scala }
+  windowSize: &windowSize { formula: 5, language: application/x-scala }
   actionSpaceEvaluated: &actionSpaceEvaluated
+    #formula: "it.unibo.learning.abstractions.ActionSpace.create(5, List(0, 1, 1.5, 2.0, 2.5, 3.0))"
     formula: "it.unibo.learning.abstractions.ActionSpace.create(20, List(0, 0.5, 1), false)"
     language: application/x-scala
 
@@ -41,8 +44,8 @@ variables:
       //torch.manual_seed(random.as[Double].toInt);
       import it.unibo.learning.network._;
       import it.unibo.scripting._;
-      new GNNSpatial(
-        hiddenSize = 256,
+      new MLPSpatial(
+        hiddenSize = 64,
         actionSpace = actionSpaceEvaluated.as[List[Any]]
       )
     language: application/x-scala
@@ -50,15 +53,15 @@ variables:
   learner: &learner
     formula: |
       import it.unibo.learning.abstractions.DecayReference;
-      import it.unibo.learning.agents.DeepGnnQLearning;
-      import it.unibo.learning.network.GraphNeuralNetworkRL;
+      import it.unibo.learning.agents.DeepQLearning;
+      import it.unibo.learning.network.MlpNeuralNetworkRL;
       import it.unibo.scripting._;
-      new DeepGnnQLearning(
-        epsilon = DecayReference.exponentialDecay(0.99, 0.1).bounded(0.05),
+      new DeepQLearning(
+        epsilon = DecayReference.exponentialDecay(0.9, 0.1).bounded(0.02),
         alpha = 0.0001,
         gamma = 0.99,
         copyEach = episodeLength.as[Int],
-        referenceNet = neuralNet.as[GraphNeuralNetworkRL]
+        referenceNet = neuralNet.as[MlpNeuralNetworkRL]
       )
     language: application/x-scala
 _constants:
@@ -70,11 +73,12 @@ seeds:
 
 layers:
   - type: CircleLayer
-    parameters: [500, 500, 200, 1]
+    parameters: [ 500, 500, 200, 0 ]
     molecule: info_old
   - type: BidimensionalGaussianLayer
     molecule: info
     parameters: [ 500, 500, 1, 100 ]
+
 environment:
   type: Continuous2DEnvironment
   parameters: []
@@ -82,8 +86,8 @@ environment:
     - time-distribution:
         type: DiracComb
         parameters: [ 0.2, 1.0 ]
-      type: GlobalLearnerDecentralisedAgentCollectiveGNN
-      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, true, "gnn-informed", *random]
+      type: GlobalLearnerDecentralisedAgentCollective
+      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, true, *random]
 
 network-model:
   type: ConnectWithinDistance
@@ -108,12 +112,11 @@ deployments:
     concentration: *view
   programs:
     - *program
-
 export:
   - type: CSVExporter
     parameters:
       exportPath: "export"
-      fileNameRoot: "gnn"
+      fileNameRoot: "mlp"
       interval: 1.0
     data:
       - time

@@ -1,4 +1,4 @@
-
+import java.io.ByteArrayOutputStream
 
 plugins {
     application
@@ -29,68 +29,89 @@ dependencies {
 val batch: String by project
 val maxTime: String by project
 val variables: String by project
-
 val alchemistGroup = "Run Alchemist"
 /*
  * This task is used to run all experiments in sequence
  */
-val runAll by tasks.register<DefaultTask>("runAll") {
+
+// Heap size estimation for batches
+val maxHeap: Long? by project
+val heap: Long = maxHeap ?: if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+    ByteArrayOutputStream().use { output ->
+        exec {
+            executable = "bash"
+            args = listOf("-c", "cat /proc/meminfo | grep MemAvailable | grep -o '[0-9]*'")
+            standardOutput = output
+        }
+        output.toString().trim().toLong() / 1024
+    }.also { println("Detected ${it}MB RAM available.") } * 9 / 10
+} else {
+    // Guess 16GB RAM of which 2 used by the OS
+    14 * 1024L
+}
+val taskSizeFromProject: Int? by project
+val taskSize = taskSizeFromProject ?: 512
+val threadCount = maxOf(1, minOf(Runtime.getRuntime().availableProcessors(), heap.toInt() / taskSize))
+
+/*
+ * This task is used to run all experiments in sequence
+ */
+val runAllGraphic by tasks.register<DefaultTask>("runAllGraphic") {
     group = alchemistGroup
-    description = "Launches all simulations"
+    description = "Launches all simulations with the graphic subsystem enabled"
+}
+val runAllBatch by tasks.register<DefaultTask>("runAllBatch") {
+    group = alchemistGroup
+    description = "Launches all experiments"
+}
+
+val pythonBin: String = ByteArrayOutputStream().use { outputStream ->
+    project.exec {
+        commandLine("pyenv",  "which", "python")
+        standardOutput = outputStream
+    }
+    outputStream.toString()
 }
 /*
  * Scan the folder with the simulation files, and create a task for each one of them.
  */
 File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
-    .filter { it.extension == "yml" } // pick all yml files in src/main/yaml
-    .sortedBy { it.nameWithoutExtension } // sort them, we like reproducibility
-    .forEach { it ->
-        // one simulation file -> one gradle task
-        val task by tasks.register<JavaExec>("run${it.nameWithoutExtension.capitalize()}") {
-            group = alchemistGroup // This is for better organization when running ./gradlew tasks
-            description = "Launches simulation ${it.nameWithoutExtension}" // Just documentation
-            mainClass.set("it.unibo.alchemist.Alchemist") // The class to launch
-            classpath = sourceSets["main"].runtimeClasspath // The classpath to use
-            // In case our simulation produces data, we write it in the following folder:
-            val exportsDir = File("${projectDir.path}/build/exports/${it.nameWithoutExtension}")
-            doFirst {
-                // this is not executed upfront, but only when the task is actually launched
-                // If the export folder doesn not exist, create it and its parents if needed
-                if (!exportsDir.exists()) {
-                    exportsDir.mkdirs()
+        ?.filter { it.extension == "yml" }
+        ?.sortedBy { it.nameWithoutExtension }
+        ?.forEach {
+            fun basetask(name: String, additionalConfiguration: JavaExec.() -> Unit = {}) = tasks.register<JavaExec>(name) {
+                group = alchemistGroup
+                description = "Launches graphic simulation ${it.nameWithoutExtension}"
+                mainClass.set("it.unibo.alchemist.Alchemist")
+                classpath = sourceSets["main"].runtimeClasspath
+                args("-y", it.absolutePath)
+                if (System.getenv("CI") == "true") {
+                    args("-hl", "-t", "2")
+                } else {
+                    args("-g", "effects/standard-effect.json")
                 }
+                jvmArgs(
+                        "-Dscalapy.python.library=python3.9",
+                        "-Dscalapy.python.programname=${pythonBin.trim()}"
+                        //Other required parameters...
+                )
+                this.additionalConfiguration()
             }
-            // Uses the latest version of java
-            /*javaLauncher.set(
-                javaToolchains.launcherFor {
-                    languageVersion.set(JavaLanguageVersion.of(11))
-                }
-            )*/
-            // These are the program arguments
-            args("-y", it.absolutePath, "-e", "$exportsDir/${it.nameWithoutExtension}-${System.currentTimeMillis()}")
-            if (System.getenv("CI") == "true" || batch == "true") {
-                // If it is running in a Continuous Integration environment, use the "headless" mode of the simulator
-                // Namely, force the simulator not to use graphical output.
-                args("-hl", "-t", maxTime)
-                if(variables.isNotEmpty()) {
-                    args("-var")
-                    variables.split(",").forEach { args(it) }
-                }
-            } else {
-                // A graphics environment should be available, so load the effects for the UI from the "effects" folder
-                // Effects are expected to be named after the simulation file
-                args("-g", "effects/effect.json")
+            val capitalizedName = it.nameWithoutExtension.capitalize()
+            val graphic by basetask("run${capitalizedName}Graphic")
+            runAllGraphic.dependsOn(graphic)
+            val batch by basetask("run${capitalizedName}Batch") {
+                description = "Launches batch experiments for $capitalizedName"
+                maxHeapSize = "${minOf(heap.toInt(), Runtime.getRuntime().availableProcessors() * taskSize)}m"
+                File("data").mkdirs()
+                args(
+                        "-e", "data/${it.nameWithoutExtension}",
+                        "-b",
+                        "-var", "random",
+                        "-t", 20000,
+                        "-p", threadCount,
+                        "-i", 1
+                )
             }
-            // This tells gradle that this task may modify the content of the export directory
-            outputs.dir(exportsDir)
+            runAllBatch.dependsOn(batch)
         }
-        // task.dependsOn(classpathJar) // Uncomment to switch to jar-based classpath resolution
-        runAll.dependsOn(task)
-    }
-
-tasks.withType<Tar>().configureEach {
-    duplicatesStrategy = DuplicatesStrategy.WARN
-}
-tasks.withType<Zip>().configureEach {
-    duplicatesStrategy = DuplicatesStrategy.WARN
-}

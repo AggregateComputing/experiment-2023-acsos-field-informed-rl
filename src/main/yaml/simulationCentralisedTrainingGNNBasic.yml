@@ -11,11 +11,9 @@ variables:
     default: 0
 
   range: &range
-    formula: 400
-
+    formula: 300
   view: &view
     formula: 75.0
-
 
   environmentBox: &environmentBox
     formula: |
@@ -23,12 +21,10 @@ variables:
       it.unibo.learning.Box(width.as[Double], spacing.as[Double], randomness.as[Double])
     language: application/x-scala
 
-  batchSize: &batchSize { formula: 512, language: application/x-scala }
+  batchSize: &batchSize { formula: 32, language: application/x-scala }
   episodeLength: &episodeLength { formula: 200, language: application/x-scala }
-  bufferSize: &bufferSize { formula: 100000, language: application/x-scala }
-  windowSize: &windowSize { formula: 5, language: application/x-scala }
+  bufferSize: &bufferSize { formula: 10000, language: application/x-scala }
   actionSpaceEvaluated: &actionSpaceEvaluated
-    #formula: "it.unibo.learning.abstractions.ActionSpace.create(5, List(0, 1, 1.5, 2.0, 2.5, 3.0))"
     formula: "it.unibo.learning.abstractions.ActionSpace.create(20, List(0, 0.5, 1), false)"
     language: application/x-scala
 
@@ -44,7 +40,7 @@ variables:
       //torch.manual_seed(random.as[Double].toInt);
       import it.unibo.learning.network._;
       import it.unibo.scripting._;
-      new MLPSpatial(
+      new GNNSpatial(
         hiddenSize = 64,
         actionSpace = actionSpaceEvaluated.as[List[Any]]
       )
@@ -53,15 +49,15 @@ variables:
   learner: &learner
     formula: |
       import it.unibo.learning.abstractions.DecayReference;
-      import it.unibo.learning.agents.DeepQLearning;
-      import it.unibo.learning.network.MlpNeuralNetworkRL;
+      import it.unibo.learning.agents.DeepGnnQLearning;
+      import it.unibo.learning.network.GraphNeuralNetworkRL;
       import it.unibo.scripting._;
-      new DeepQLearning(
-        epsilon = DecayReference.exponentialDecay(0.9, 0.1).bounded(0.02),
+      new DeepGnnQLearning(
+        epsilon = DecayReference.exponentialDecay(0.99, 0.1).bounded(0.02),
         alpha = 0.0001,
         gamma = 0.99,
-        copyEach = episodeLength.as[Int],
-        referenceNet = neuralNet.as[MlpNeuralNetworkRL]
+        copyEach = 50,
+        referenceNet = neuralNet.as[GraphNeuralNetworkRL]
       )
     language: application/x-scala
 _constants:
@@ -73,11 +69,12 @@ seeds:
 
 layers:
   - type: CircleLayer
-    parameters: [ 500, 500, 200, 1 ]
+    parameters: [500, 500, 200, 0]
     molecule: info_old
   - type: BidimensionalGaussianLayer
     molecule: info
     parameters: [ 500, 500, 1, 100 ]
+
 
 environment:
   type: Continuous2DEnvironment
@@ -86,8 +83,8 @@ environment:
     - time-distribution:
         type: DiracComb
         parameters: [ 0.2, 1.0 ]
-      type: GlobalLearnerDecentralisedAgentCollective
-      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, true, *random]
+      type: GlobalLearnerDecentralisedAgentCollectiveGNN
+      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, true, "gnn", *random]
 
 network-model:
   type: ConnectWithinDistance
@@ -101,7 +98,7 @@ _reactions:
         type: Event
         actions:
           - type: RunScafiProgram
-            parameters: [it.unibo.scafi.ExplorerCollective, 2 ]
+            parameters: [it.unibo.scafi.ExplorerBasic, 2 ]
       - program: send
 
 deployments:
@@ -112,11 +109,12 @@ deployments:
     concentration: *view
   programs:
     - *program
+
 export:
   - type: CSVExporter
     parameters:
       exportPath: "export"
-      fileNameRoot: "mlp"
+      fileNameRoot: "basic"
       interval: 1.0
     data:
       - time
