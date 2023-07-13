@@ -92,7 +92,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                 }
                 jvmArgs(
                         "-Dscalapy.python.library=python3.9",
-                         "-Dscalapy.python.programname=${if (System.getenv("CI") == "true") { "" } else { pythonBin() }}",
+                         "-Dscalapy.python.programname=${if (System.getenv("CI") == "true") { "" } else if (System.getenv("DOCKER") == "true") { "/usr/local/bin/python3.9" } else { pythonBin() }}",
                         //Other required parameters...
                 )
                 this.additionalConfiguration()
