@@ -1,9 +1,9 @@
 import simulations_launcher
 
 simulation = [
-    "simulationTestGNN",
-    "simulationTestGNNMoving",
-    "simulationTestGNNTWo",
+    #"simulationTestGNN",
+    #"simulationTestGNNMoving",
+    "simulationTestGNNTwo",
     "simulationTestGNNBasic",
     "simulationTestGNNMovingBasic",
     "simulationTestMLP",

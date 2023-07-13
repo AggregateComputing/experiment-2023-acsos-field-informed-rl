@@ -39,7 +39,7 @@ class AngleDrawer extends Effect {
     g.setStroke(new BasicStroke(strokeValue))
     val path = new Path2D.Float()
     path.moveTo(0, 0)
-    path.lineTo(math.cos(angle) * intensityValue, math.sin(angle) * intensityValue)
+    path.lineTo(-(math.cos(angle) * -intensityValue) , -(math.sin(angle) * intensityValue))
     val transform = new AffineTransform
     transform.translate(x, y)
     transform.scale(maxValue, maxValue)
