@@ -22,6 +22,7 @@ def create_net_random_section(seed):
 def task(name):
     os.system("./gradlew runSimulationBatch")
 
+
 def run(seeds, simulations):
     # Prepare the file to be copied net file
     yaml_fold = os.getcwd() + "/src/main/yaml/"
@@ -43,6 +44,10 @@ def run(seeds, simulations):
             # Upper case only the first parameter of file
             # Launch the command simulation, and wait for it to finish
             process = Process(target=task, args=("./gradlew runSimulationBatch",))
+            process.start()
+            process.join()
+            process.kill()
+            process = Process(target=task, args=("./gradlew --stop",))
             process.start()
             process.join()
             process.kill()
