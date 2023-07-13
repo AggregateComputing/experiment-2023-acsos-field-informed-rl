@@ -65,22 +65,12 @@ jobs:
         with:
           name: charts
           path: charts.tar.zst
-  check-simulations-docker:
-    runs-on: ubuntu-22.04
-    concurrency:
-      group: container-check${{ github.workflow }}${{ matrix.os }}${{ github.event.number || github.ref }}
-      cancel-in-progress: true
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3.3.0
-    - name: Run compose
-      run: docker-compose build
+
   release:
     permissions:
       contents: write
     needs:
       - check-simulations-native
-      - check-simulations-docker
       - create-charts
     runs-on: ubuntu-22.04
     concurrency:
@@ -109,11 +99,6 @@ jobs:
         uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{ steps.node-version.outputs.version }}
-      - name: Login to dockerhub
-        env:
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_USERNAME: aggregatecomputing
-        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
