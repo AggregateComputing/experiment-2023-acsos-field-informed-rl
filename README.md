@@ -4,9 +4,11 @@ This repository contains the code for the experiments of the paper "Field-inform
 The code leverages [Alchemist]() as the simulation framework and [PyTorch Geometric](https://pytorch-geometric.readthedocs.io/en/latest/) as the GNN library.
 
 ## Installation
-- A working JDK 11 installation
-- A working Python 3.8 installation
 
+- A working JDK 11 installation
+- A working pyenv installation -> [guide]()
+
+### Steps
 ## Commands
 To run both the training and the evaluation of the model, run the following command:
 ```bash
