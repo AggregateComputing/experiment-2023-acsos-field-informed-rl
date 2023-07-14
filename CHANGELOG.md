@@ -1,3 +1,15 @@
+## [1.1.1](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/compare/1.1.0...1.1.1) (2023-07-14)
+
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.1.0 [skip ci] ([7b8146b](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/commit/7b8146b53b739ec0b7b742f3b4360174de095b4b))
+
+
+### Documentation
+
+* improve README ([f4806d4](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/commit/f4806d4031a2e99e1726fe17dc2446828853974d))
+
 ## [1.1.0](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/compare/1.0.0...1.1.0) (2023-07-14)
 
 
