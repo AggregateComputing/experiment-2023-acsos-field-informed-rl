@@ -1,3 +1,15 @@
+## [1.1.2](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/compare/1.1.1...1.1.2) (2023-07-14)
+
+
+### Bug Fixes
+
+* put the right name in the simulation launcher ([5b17e4e](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/commit/5b17e4e125a28a119994be497aa865a4ab3bc2a3))
+
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.1.1 [skip ci] ([8fc0dc9](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/commit/8fc0dc90b1b778dff10394de9876acdd8d25c907))
+
 ## [1.1.1](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/compare/1.1.0...1.1.1) (2023-07-14)
 
 
