@@ -6,6 +6,7 @@ simulation = [
     "simulationTestGNNTwo",
     "simulationTestGNNBasic",
     "simulationTestGNNMovingBasic",
+    "simulationTestGNNTwoBasic",
     "simulationTestMLP",
     "simulationTestMLPTwo",
     "simulationTestMLPMoving"

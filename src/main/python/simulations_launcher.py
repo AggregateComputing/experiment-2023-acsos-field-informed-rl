@@ -46,9 +46,11 @@ def run(seeds, simulations, timeout):
             process = Process(target=task, args=("./gradlew runSimulationBatch",))
             process.start()
             process.join(timeout)
+            pid = process.pid
+            os.system("kill -9 " + str(pid))
             process.kill()
             process = Process(target=task, args=("./gradlew --stop",))
             process.start()
-            process.join()
+            process.join(timeout)
             process.kill()
             print("done with seed: " + str(i) + " for file: " + file + "\n")
