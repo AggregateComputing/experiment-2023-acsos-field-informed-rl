@@ -1,3 +1,22 @@
+## [1.1.0](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/compare/1.0.0...1.1.0) (2023-07-14)
+
+
+### Features
+
+* add test data ([a061025](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/commit/a0610251bf0f9efa3ab110236a1cb340515f05f3))
+* correctly computing the coverage ([449764f](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/commit/449764fa105709dd67244a1b84d3a2b118aadaba))
+* minors on simulation ([58283f0](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/commit/58283f04d3698c4cb4d95cf8e417ec4752be41f3))
+
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.0 [skip ci] ([4781560](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/commit/4781560074aa8b6bd5a6d4eac2a38376cf00bb86))
+
+
+### Documentation
+
+* on readme ([6c62c53](https://github.com/AggregateComputing/experiment-2023-acsos-field-informed-rl/commit/6c62c53367d3ee4a55fc6ac63b2496cd183b205f))
+
 ## 1.0.0 (2023-07-13)
 
 
