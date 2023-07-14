@@ -23,7 +23,7 @@ def task(name):
     os.system("./gradlew runSimulationBatch")
 
 
-def run(seeds, simulations):
+def run(seeds, simulations, timeout):
     # Prepare the file to be copied net file
     yaml_fold = os.getcwd() + "/src/main/yaml/"
     os.environ['CUBLAS_WORKSPACE_CONFIG'] = ":4096:8"
@@ -45,7 +45,7 @@ def run(seeds, simulations):
             # Launch the command simulation, and wait for it to finish
             process = Process(target=task, args=("./gradlew runSimulationBatch",))
             process.start()
-            process.join()
+            process.join(timeout)
             process.kill()
             process = Process(target=task, args=("./gradlew --stop",))
             process.start()

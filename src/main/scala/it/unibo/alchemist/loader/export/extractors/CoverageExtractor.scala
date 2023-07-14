@@ -41,7 +41,7 @@ class CoverageExtractor(val size: Double, layers: Int) extends Extractor[Double]
       .toList
     val circles = layers
       .map(layer =>
-        new Ellipse2D.Double(layer.x - layer.radius, -layer.y - layer.radius, layer.radius * 2, layer.radius * 2)
+        new Ellipse2D.Double(layer.movingX - layer.radius, -layer.movingY - layer.radius, layer.radius * 2, layer.radius * 2)
       )
 
     def computeCoverage(reference: Ellipse2D): Double = {

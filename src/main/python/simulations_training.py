@@ -6,4 +6,4 @@ simulation = [
     "simulationCentralisedTrainingMLP"
 ]
 
-simulations_launcher.run(16, simulation)
+simulations_launcher.run(16, simulation, 60 * 320)

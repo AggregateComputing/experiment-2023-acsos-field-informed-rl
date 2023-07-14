@@ -5,16 +5,17 @@ variables:
   spacing: &spacing { formula: 200.0 }
   randomness: &randomness { formula: 25.0 }
   random: &random
-    min: 0
-    max: 0
+    min: 63
+    max: 63
     step: 1
-    default: 0
+    default: 63
 
   range: &range
     formula: 300
 
   view: &view
     formula: 75.0
+
 
   environmentBox: &environmentBox
     formula: |
@@ -23,7 +24,7 @@ variables:
     language: application/x-scala
 
   batchSize: &batchSize { formula: 32, language: application/x-scala }
-  episodeLength: &episodeLength { formula: 1000, language: application/x-scala }
+  episodeLength: &episodeLength { formula: 200, language: application/x-scala }
   bufferSize: &bufferSize { formula: 1000, language: application/x-scala }
   actionSpaceEvaluated: &actionSpaceEvaluated
     formula: "it.unibo.learning.abstractions.ActionSpace.create(20, List(0, 0.5, 1), false)"
@@ -41,7 +42,7 @@ variables:
       import it.unibo.learning.network._;
       import it.unibo.scripting._;
       new GNNSpatial(
-        hiddenSize = 64,
+        hiddenSize = 256,
         actionSpace = actionSpaceEvaluated.as[List[Any]]
       )
     language: application/x-scala
@@ -69,11 +70,20 @@ seeds:
 
 layers:
   - type: CircleLayer
-    parameters: [500, 500, 200, 1]
+    parameters: [ 200, 200, 200, 0 ]
     molecule: info_old
-  - type: BidimensionalMovableLayer
+  - type: CircleLayer
+    parameters: [ 700, 700, 200, 0 ]
+    molecule: info_old2
+  - type: BidimensionalGaussianLayer
+    parameters: [700, 700, 1, 100]
+    molecule: info1
+  - type: BidimensionalGaussianLayer
+    parameters: [200, 200, 1, 100 ]
+    molecule: info2
+  - type: CombineAllLayer
+    parameters: [ ]
     molecule: info
-    parameters: [ 500, 500, 1, 100 ]
 environment:
   type: Continuous2DEnvironment
   parameters: []
@@ -82,12 +92,8 @@ environment:
         type: DiracComb
         parameters: [ 0.2, 1.0 ]
       type: GlobalLearnerDecentralisedAgentCollectiveGNN
-      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false, "gnn", *random]
-    - time-distribution:
-        type: DiracComb
-        parameters: [ 0.2, 4.0 ]
-      type: MovingLayer
-      parameters: [ *episodeLength ]
+      parameters: [*learner, *bufferSize, *batchSize, *actionSpaceEvaluated, *episodeLength, *environmentBox, false, "gnn-informed", *random]
+
 
 network-model:
   type: ConnectWithinDistance
@@ -101,7 +107,7 @@ _reactions:
         type: Event
         actions:
           - type: RunScafiProgram
-            parameters: [it.unibo.scafi.ExplorerBasic, 2 ]
+            parameters: [it.unibo.scafi.ExplorerCollectiveTwoLayer, 2 ]
       - program: send
 deployments:
   type: Grid
@@ -115,17 +121,23 @@ export:
   - type: CSVExporter
     parameters:
       exportPath: "test"
-      fileNameRoot: "moving-gnn"
+      fileNameRoot: "two-informed"
       interval: 1.0
     data:
       - time
       - type: CoverageExtractor
-        parameters: [ *view ]
+        parameters: [ *view, 2 ]
       - type: StoreExtractor
       - molecule: inside
+        aggregators: [ sum ]
+        value-filter: onlyfinite
+      - molecule: inside_1
+        aggregators: [ sum ]
+        value-filter: onlyfinite
+      - molecule: inside_2
         aggregators: [ sum ]
         value-filter: onlyfinite
 
 terminate:
   - type: AfterTime
-    parameters: 200
+    parameters: 200.0

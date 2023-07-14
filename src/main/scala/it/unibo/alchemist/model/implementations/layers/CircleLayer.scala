@@ -14,4 +14,5 @@ class CircleLayer[P <: Position2D[P]](
   override def value(x: Double, y: Double): Double = valueBase
   override protected def isInside(x: Double, y: Double): Boolean =
     Math.sqrt(Math.pow(x - movingX, 2) + Math.pow(y - movingY, 2)) <= radius
+
 }

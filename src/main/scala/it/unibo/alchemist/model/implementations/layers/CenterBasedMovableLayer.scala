@@ -8,8 +8,8 @@ trait CenterBasedMovableLayer[P <: Position2D[P]] extends MovableLayer with Laye
 
   def value(x: Double, y: Double): Double // value of the layer
 
-  protected var movingX: Double = x
-  protected var movingY: Double = y
+  var movingX: Double = x
+  var movingY: Double = y
 
   override def getValue(p: P): Double = {
     // check if the point is inside the circle
